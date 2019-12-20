@@ -1,8 +1,29 @@
 {
   "name": "@adias/file-uploader",
   "version": "1.0.0",
+  "description": "Angular Library for uploading files",
   "peerDependencies": {
     "@angular/common": "^8.2.14",
     "@angular/core": "^8.2.14"
-  }
+  },
+  "keywords": [
+    "ngx",
+    "angular",
+    "file uploader",
+    "angular file uploader",
+    "awesome uploader",
+    "drag and drop",
+    "image cropper",
+    "angular image uploader",
+    "angular uploader",
+    "angular file upload"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/techaks/-adias-file-uploader",
+  "author": {
+    "name": "Akash Gupta",
+    "url": "https://twitter.com/techaks",
+    "email": "akash@adias.tech"
+  },
+  "homepage": "https://adias-file-uploader.stackblitz.io"
 }

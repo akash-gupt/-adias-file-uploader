@@ -10,6 +10,8 @@ File Uploader for Angular
 
 ---
 
+see Demo [here](https://adias-file-uploader.stackblitz.io)
+
 ### Example:
 
 > app.module.ts
