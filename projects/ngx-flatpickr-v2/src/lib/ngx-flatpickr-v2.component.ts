@@ -10,10 +10,16 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  Renderer,
   SimpleChanges,
   ViewChild
 } from "@angular/core";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR
+} from "@angular/forms";
 import flatpickrImport from "flatpickr";
 import locale from "flatpickr/dist/l10n";
 import { Instance } from "flatpickr/dist/types/instance";
@@ -22,11 +28,19 @@ import { Options } from "flatpickr/dist/types/options";
 import * as _moment from "moment";
 
 const moment = _moment;
-export const NGX_FLATPICKR_ACCESSOR: any = {
-  provide: NG_VALUE_ACCESSOR,
-  useExisting: forwardRef(() => NgxFlatpickrV2Component),
-  multi: true
-};
+export const NGX_FLATPICKR_ACCESSOR: any = [
+  {
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => NgxFlatpickrV2Component),
+    multi: true
+  },
+
+  {
+    provide: NG_VALIDATORS,
+    useExisting: forwardRef(() => NgxFlatpickrV2Component),
+    multi: true
+  }
+];
 
 @Component({
   selector: "ngx-flatpickr",
@@ -39,7 +53,7 @@ export const NGX_FLATPICKR_ACCESSOR: any = {
     />
   `,
 
-  providers: [NGX_FLATPICKR_ACCESSOR]
+  providers: NGX_FLATPICKR_ACCESSOR
 })
 export class NgxFlatpickrV2Component
   implements ControlValueAccessor, OnInit, OnChanges, OnDestroy {
@@ -51,34 +65,55 @@ export class NgxFlatpickrV2Component
   @Input() public class: string;
   @Input() public placeholder: string;
   @Output() public onInit: EventEmitter<Instance>;
-  @Input() private selectedDates: [] = [];
-
-  @Input() public default: Date;
-  @Output() public onDateSelect: EventEmitter<Date | Date[]>;
+  @Input() private selectedDates: any[] = [];
+  @Input() private enabledDates: any[] = [];
+  @Input() private enableSelectedDatesOnly: boolean = false;
+  @Input() public default: string = moment().format();
+  @Output() public onDateSelect: EventEmitter<string>;
   @Output() public onDayCreate = new EventEmitter();
-
-  private onChange: (_: Date | Date[]) => void;
+  private parseError: boolean;
+  private onChange: (_: string) => void;
   private onTouched: () => void;
 
-  constructor() {
+  constructor(private renderer: Renderer) {
     this.options = {};
     this.language = "";
     this.class = "";
     this.placeholder = "";
     this.onInit = new EventEmitter<Instance>();
-    this.onDateSelect = new EventEmitter<Date | Date[]>();
+    this.onDateSelect = new EventEmitter<string>();
 
-    this.onChange = (_: Date | Date[]) => {};
+    this.onChange = (_: string) => {};
     this.onTouched = () => {};
   }
 
   // <Angular hooks>
   ngOnInit(): void {
+    this.initialize();
+  }
+
+  initialize() {
     this.instance = flatpickrImport(this.el.nativeElement, {
       ...this.options,
-      onChange: (selectedDates: Date[]) => {
-        this.onDateSelect.emit(selectedDates);
-        this.onChange(selectedDates);
+      enable: [
+        date => {
+          if (this.enableSelectedDatesOnly) {
+            const d = moment(date).format("YYYY-MM-DD");
+            return this.selectedDates.includes(d);
+          }
+          if (this.enabledDates.length > 0) {
+            const d = moment(date).format("YYYY-MM-DD");
+            return this.enabledDates.includes(d);
+          }
+          if (this.enabledDates.length === 0) {
+            return true;
+          }
+        }
+      ],
+      onChange: (selectedDates: [], dateStr, instance) => {
+        const date = moment(dateStr).format();
+        this.onChange(date);
+        this.onDateSelect.emit(date);
       },
       onDayCreate: (dObj, dStr, fp, dayElem) => {
         this.onDayCreate.emit({ dObj, dStr, fp, dayElem });
@@ -97,6 +132,9 @@ export class NgxFlatpickrV2Component
     if (this.instance != undefined && changes.hasOwnProperty("default")) {
       this.setDate(changes["default"].currentValue);
     }
+    if (this.instance != undefined && changes.hasOwnProperty("selectedDates")) {
+      this.initialize();
+    }
   }
 
   ngOnDestroy(): void {
@@ -105,11 +143,11 @@ export class NgxFlatpickrV2Component
   // </Angular hooks>
 
   // <FormControl>
-  writeValue(value: Date | Date[]): void {
+  writeValue(value: string): void {
     this.setDate(value);
   }
 
-  registerOnChange(fn: (_: Date | Date[]) => void): void {
+  registerOnChange(fn: (_: string) => void): void {
     this.onChange = fn;
   }
 
@@ -282,18 +320,33 @@ export class NgxFlatpickrV2Component
     }
   }
 
-  setDate(newdate: Date | Date[]): void {
+  setDate(newdate: string): void {
     this.instance.setDate(newdate, true);
-    this.onDateSelect.emit(newdate);
     this.onChange(newdate);
+  }
+
+  setDisabledState(isDisabled: boolean) {
+    this.renderer.setElementProperty(
+      this.el.nativeElement,
+      "disabled",
+      isDisabled
+    );
+  }
+
+  public validate(c: FormControl) {
+    return !this.parseError
+      ? null
+      : {
+          jsonParseError: {
+            valid: false
+          }
+        };
   }
 
   setSelectedDays(fp, dayElem) {
     const filtered = this.selectedDates.filter(value => {
       return moment(dayElem.dateObj).isSame(moment(value), "dates");
     });
-
-    console.log(filtered);
     if (filtered.length > 0) {
       dayElem.classList.add("success");
     }

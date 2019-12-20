@@ -30,6 +30,12 @@
       ],
       "ngx-flatpickr-v2/*": [
         "dist/ngx-flatpickr-v2/*"
+      ],
+      "@adias/file-uploader": [
+        "dist/adias/file-uploader"
+      ],
+      "@adias/file-uploader/*": [
+        "dist/adias/file-uploader/*"
       ]
     }
   },

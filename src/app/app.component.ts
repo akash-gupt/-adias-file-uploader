@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { FilePickerRespnse } from "projects/adias/file-uploader/src/public-api";
 
 @Component({
   selector: "app-root",
@@ -6,12 +7,9 @@ import { Component } from "@angular/core";
   styleUrls: ["./app.component.scss"]
 })
 export class AppComponent {
-  title = "ngx-availability-calender";
-  selectedDates = ["2019-11-22"];
-  onDayCreate(e: any) {
-    // const dayElem = e.dayElem;
-    // if (moment(dayElem.dateObj).isSame(moment().add(1, "day"), "date")) {
-    //   dayElem.classList.add("warning");
-    // }
+  onUploadSuccess(e: FilePickerRespnse) {
+    console.log("fileUrl ===", e.fileUrl);
+    console.log("fileName ===", e.fileName);
+    console.log("fileSize ===", e.fileSize);
   }
 }

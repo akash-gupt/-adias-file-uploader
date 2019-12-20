@@ -817,3 +817,17 @@ span.flatpickr-weekday {
 .warning {
   border: 2px solid #ffaa00;
 }
+
+input {
+  border-radius: 0.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5rem;
+  padding: 0.6875rem 1.125rem;
+  background-color: #f7f9fc;
+  border-color: #e4e9f2;
+  color: #222b45;
+  outline: 0;
+  border-style: solid;
+  border-width: 1px;
+}

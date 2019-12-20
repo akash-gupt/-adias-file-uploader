@@ -178,6 +178,41 @@
           }
         }
       }
+    },
+    "@adias/file-uploader": {
+      "projectType": "library",
+      "root": "projects/adias/file-uploader",
+      "sourceRoot": "projects/adias/file-uploader/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/adias/file-uploader/tsconfig.lib.json",
+            "project": "projects/adias/file-uploader/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/adias/file-uploader/src/test.ts",
+            "tsConfig": "projects/adias/file-uploader/tsconfig.spec.json",
+            "karmaConfig": "projects/adias/file-uploader/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/adias/file-uploader/tsconfig.lib.json",
+              "projects/adias/file-uploader/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "ngx-availability-calender"
