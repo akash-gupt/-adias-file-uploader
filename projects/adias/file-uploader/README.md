@@ -1,6 +1,6 @@
-# @adias/file-uploader
+# adias-file-uploader
 
-[![npm version](https://badge.fury.io/js/ngx-flatpickrjs.svg)](https://www.npmjs.com/package/ngx-flatpickrjs)
+[![npm version](https://badge.fury.io/js/adias-file-uploader.svg)](https://badge.fury.io/js/adias-file-uploader)
 
 ---
 
@@ -17,10 +17,10 @@ see Demo [here](https://adias-file-uploader.stackblitz.io)
 > app.module.ts
 
 ```ts
-import { FileUploaderModule } from "@adias/file-uploader";
+import { FileUploaderModule } from "adias-file-uploader";
 
 FileUploaderModule.forRoot({
-  endPoint: "https://api.timberlinehelicharters.com/api/upload"
+  endPoint: "https://api.example.com/api/upload"
 });
 ```
 

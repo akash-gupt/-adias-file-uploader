@@ -12,7 +12,7 @@ import { AppComponent } from "./app.component";
     HttpClientModule,
     ReactiveFormsModule,
     FileUploaderModule.forRoot({
-      endPoint: "https://api.timberlinehelicharters.com/api/upload"
+      endPoint: "http://localhost:3334/api/upload"
     })
   ],
   providers: [],
