@@ -3,10 +3,12 @@ import {
   ElementRef,
   EventEmitter,
   HostListener,
+  Input,
   OnInit,
   Output,
   Renderer2
 } from "@angular/core";
+import { map } from "rxjs/operators";
 import { FilePickerRespnse } from "./file-picker.response";
 import { FileUploaderService } from "./file-uploader.service";
 
@@ -15,6 +17,8 @@ import { FileUploaderService } from "./file-uploader.service";
 })
 export class FilePickerDirective implements OnInit {
   @Output() uploadSuccess = new EventEmitter<FilePickerRespnse>();
+  @Input() fileUrl: string = null;
+
   element: HTMLElement;
   hoverdDiv: HTMLElement;
   spinnerDiv: HTMLElement;
@@ -22,6 +26,7 @@ export class FilePickerDirective implements OnInit {
   button: HTMLElement;
   image: HTMLElement;
   uploadedFiles: Array<File>;
+
   /** disabled till upload */
   mouseoverDisabled = false;
 
@@ -38,6 +43,10 @@ export class FilePickerDirective implements OnInit {
     this.createUploadButton();
     this.createHoveredDiv();
     this.createSpinnerDiv();
+
+    if (this.fileUrl) {
+      this.previewImage(this.fileUrl);
+    }
   }
 
   createSpinnerDiv() {
@@ -106,6 +115,7 @@ export class FilePickerDirective implements OnInit {
     this.renderer.setStyle(this.button, "font-weight", "600");
     this.renderer.setStyle(this.button, "font-size", "16px");
     this.renderer.setStyle(this.button, "display", "none");
+    this.renderer.setProperty(this.button, "type", "button");
     const buttontext = this.renderer.createText("Select File");
     this.renderer.appendChild(this.button, buttontext);
     this.renderer.appendChild(this.element, this.button);
@@ -134,20 +144,35 @@ export class FilePickerDirective implements OnInit {
   upload(file: File) {
     this.showSpinner();
     this.mouseoverDisabled = true;
-    this.uploaderService.upload(file).subscribe({
-      next: (result: FilePickerRespnse) => {
-        if (result && typeof result === "object") {
-          this.uploadSuccess.emit(result);
-          this.previewImage(result.fileUrl);
+    this.uploaderService
+      .upload(file)
+      .pipe(
+        map((response: any) => {
+          if (response && typeof response === "object") {
+            if (response.hasOwnProperty("result")) {
+              return response["result"];
+            } else if (response.hasOwnProperty("data")) {
+              return response["data"];
+            }
+          }
+
+          return response;
+        })
+      )
+      .subscribe({
+        next: (response: FilePickerRespnse) => {
+          if (response && typeof response === "object") {
+            this.uploadSuccess.emit(response);
+            this.previewImage(response.fileUrl);
+          }
+        },
+        complete: () => {
+          setTimeout(() => {
+            this.hideSpinner();
+            this.mouseoverDisabled = false;
+          }, 2000);
         }
-      },
-      complete: () => {
-        setTimeout(() => {
-          this.hideSpinner();
-          this.mouseoverDisabled = false;
-        }, 2000);
-      }
-    });
+      });
   }
 
   previewImage(fileUrl: string) {
@@ -159,7 +184,6 @@ export class FilePickerDirective implements OnInit {
     if (this.mouseoverDisabled) {
       return;
     }
-    console.log("mouseover");
     this.addHoverEffect();
     this.showButton();
   }

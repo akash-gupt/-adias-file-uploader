@@ -38,6 +38,15 @@ FileUploaderModule.forRoot({
 <div ngxFilePicker (uploadSuccess)="onUploadSuccess($event)"></div>
 ```
 
+OR
+
+```HTML
+
+Custom file url can be also used
+
+<div ngxFilePicker [fileUrl]="uploadedFileUrl" (uploadSuccess)="onUploadSuccess($event)"></div>
+```
+
 ## Events
 
 - **uploadSuccess** _(Output)_:
